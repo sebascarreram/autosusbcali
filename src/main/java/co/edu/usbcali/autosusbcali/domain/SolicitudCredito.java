@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "solicitudes_credito")
@@ -21,14 +20,25 @@ public class SolicitudCredito {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "entidad_financiera_id")
+    @JoinColumn(name = "cotizacion_id", nullable = false)
+    private Cotizacion cotizacion;
+
+    @ManyToOne
+    @JoinColumn(name = "comprador_id", nullable = false)
+    private Usuario comprador;
+
+    @ManyToOne
+    @JoinColumn(name = "entidad_financiera_id", nullable = false)
     private EntidadFinanciera entidadFinanciera;
 
-    @Column(name = "monto_solicitado",nullable = false, precision = 15, scale = 2)
+    @Column(name="monto_solicitado", nullable = false, precision = 15, scale = 2)
     private BigDecimal montoSolicitado;
 
-    @Column(name = "cuota_inicial", precision = 15, scale = 2)
+    @Column(name="cuota_inicial", nullable = false, precision = 15, scale = 2)
     private BigDecimal cuotaInicial;
+
+    @Column(name="plazo_meses", nullable = false)
+    private Short plazoMeses;
 
     @Column(name = "estado", length = 20, nullable = false)
     private String estado;
@@ -37,8 +47,8 @@ public class SolicitudCredito {
     private String observaciones;
 
     @Column(name = "fecha_envio", nullable = false)
-    private LocalDateTime fechaEnvio;
+    private OffsetDateTime fechaEnvio;
 
     @Column(name = "fecha_respuesta")
-    private LocalDateTime fechaRespuesta;
+    private OffsetDateTime fechaRespuesta;
 }

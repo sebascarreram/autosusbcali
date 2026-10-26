@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-
 public class EntidadFinanciera {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,7 +18,7 @@ public class EntidadFinanciera {
     @Column(name = "nombre", length = 100, nullable = false)
     private String nombre;
 
-    @Column(name = "nit", length = 20, nullable = false)
+    @Column(name = "nit", length = 20, nullable = false, unique = true)
     private String nit;
 
     @Column(name = "endpoint_api", length = 500)
