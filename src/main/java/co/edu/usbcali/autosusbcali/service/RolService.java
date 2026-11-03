@@ -1,6 +1,7 @@
 package co.edu.usbcali.autosusbcali.service;
 
 import co.edu.usbcali.autosusbcali.domain.Rol;
+import co.edu.usbcali.autosusbcali.dto.request.CrearModificarRolRequest;
 import co.edu.usbcali.autosusbcali.dto.response.ObtenerRolResponse;
 import co.edu.usbcali.autosusbcali.mapper.RolMapper;
 import co.edu.usbcali.autosusbcali.repository.RolRepository;
@@ -38,4 +39,49 @@ public class RolService implements IRolService{
                 .orElseThrow(() -> new RuntimeException("No se ha encontrado el rol por id "+id));
         return RolMapper.rolAObtenerRolResponse(rolPorId);
     }
+
+    @Override
+    public ObtenerRolResponse crearRol(CrearModificarRolRequest crearRolRequest) throws Exception {
+        // Generar validaciones del objeto #
+        if (crearRolRequest == null) {
+            throw new Exception("El objeto  no puede ser nulo.");
+        }
+        if (crearRolRequest.nombre() == null
+                || crearRolRequest.nombre().isBlank()) {
+            throw new Exception("El nombre no puede ser nulo ni estar vacío.");
+        }
+        if (crearRolRequest.descripcion() == null
+                || crearRolRequest.descripcion().isBlank()) {
+            throw new Exception("El descripcion no puede ser nulo ni estar vacío.");
+        }
+        //buscar si exsiste un rol con el nombre que se quiere agregar
+        /*
+        * Optional<Rol> rolPorNombre = rolRepository.findByNombre(.nombre());
+        if (rolPorNombre.isPresent()) {
+            throw new Exception("El rol existe en la base de datos "+.nombre());
+        }*/
+
+        //buscar si exsiste un rol con el nombre que se quiere agregar opcion 2
+        if (rolRepository.existsByNombre(crearRolRequest.nombre())) {
+            throw new Exception("Ya existe el rol con el mismo nombre.");
+        }
+
+        // Usar mapper para convertir DTO a objeto de Domain
+        Rol rol = RolMapper.crearModificarRolRequestARol(crearRolRequest);
+
+        // persistir el Rol en base de datos
+        rol = rolRepository.save(rol);
+
+        // crear DTO response obtenerRolResponse
+        ObtenerRolResponse rolResponse = RolMapper.rolAObtenerRolResponse(rol);
+
+        return rolResponse;
+    }
+
+    @Override
+    public ObtenerRolResponse modificarRol(Long id, CrearModificarRolRequest modificarRolRequest) throws Exception {
+        return null;
+    }
+
+
 }
