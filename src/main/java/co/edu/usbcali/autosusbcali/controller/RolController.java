@@ -57,13 +57,22 @@ public class RolController {
                 HttpStatus.CREATED
         );
     }
+
     @PutMapping("/modificar/{id}")
     public ResponseEntity<ObtenerRolResponse> modificarRol(
-            @RequestBody CrearModificarRolRequest crearRolRequest) throws Exception {
+            @PathVariable Long id,
+            @RequestBody CrearModificarRolRequest modificarRolRequest) throws Exception {
         return new ResponseEntity<>(
-                rolService.crearRol(crearRolRequest),
-                HttpStatus.CREATED
+                rolService.modificarRol(id, modificarRolRequest),
+                HttpStatus.OK
         );
     }
+
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<Void> eliminarRol(@PathVariable Long id) throws Exception {
+        rolService.eliminarRol(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 
 }

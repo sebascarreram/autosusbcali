@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class RolService implements IRolService{
+public class RolService implements IRolService {
     private final RolRepository rolRepository;
 
     @Override
@@ -29,14 +29,14 @@ public class RolService implements IRolService{
     @Override
     public ObtenerRolResponse obtenerRolPorNombre(String nombre) {
         Rol rolPorNombre = rolRepository.findByNombre(nombre)
-                .orElseThrow(() -> new RuntimeException("No se ha encontrado el rol por nombre: "+nombre));
+                .orElseThrow(() -> new RuntimeException("No se ha encontrado el rol por nombre: " + nombre));
         return RolMapper.rolAObtenerRolResponse(rolPorNombre);
     }
 
     @Override
     public ObtenerRolResponse obtenerRolPorId(Long id) {
         Rol rolPorId = rolRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("No se ha encontrado el rol por id "+id));
+                .orElseThrow(() -> new RuntimeException("No se ha encontrado el rol por id " + id));
         return RolMapper.rolAObtenerRolResponse(rolPorId);
     }
 
@@ -79,9 +79,44 @@ public class RolService implements IRolService{
     }
 
     @Override
-    public ObtenerRolResponse modificarRol(Long id, CrearModificarRolRequest modificarRolRequest) throws Exception {
-        return null;
+    public ObtenerRolResponse modificarRol(Long id, CrearModificarRolRequest request) throws Exception {
+        // 1. Validaciones básicas
+        if (request == null) {
+            throw new Exception("El objeto no puede ser nulo.");
+        }
+        if (request.nombre() == null || request.nombre().isBlank()) {
+            throw new Exception("El nombre no puede ser nulo ni estar vacío.");
+        }
+        if (request.descripcion() == null || request.descripcion().isBlank()) {
+            throw new Exception("La descripción no puede ser nula ni estar vacía.");
+        }
+
+        // 2. Buscar si el rol a modificar existe por su ID
+        Rol rolExistente = rolRepository.findById(id)
+                .orElseThrow(() -> new Exception("El rol con ID " + id + " no fue encontrado"));
+
+        // 3. Validar si el nombre ya lo tiene OTRO rol diferente
+        Rol rolConMismoNombre = rolRepository.findByNombre(request.nombre()).orElse(null);
+        if (rolConMismoNombre != null && !rolConMismoNombre.getId().equals(id)) {
+            throw new Exception("Ya existe otro rol con el mismo nombre.");
+        }
+
+        // 4. Actualizar los campos
+        rolExistente.setNombre(request.nombre());
+        rolExistente.setDescripcion(request.descripcion());
+
+        // 5. Guardar cambios (UPDATE)
+        Rol rolActualizado = rolRepository.save(rolExistente);
+
+        // 6. Retornar respuesta
+        return RolMapper.rolAObtenerRolResponse(rolActualizado);
     }
 
+    @Override
+    public void eliminarRol(Long id) throws Exception {
+        Rol rol = rolRepository.findById(id).orElseThrow(()-> new Exception("El rol con ID "+ id + " no fue encontrado para eliminar"));
 
+        rolRepository.delete(rol);
+
+    }
 }
