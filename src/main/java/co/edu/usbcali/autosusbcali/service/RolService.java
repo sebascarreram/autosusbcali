@@ -80,7 +80,7 @@ public class RolService implements IRolService {
 
     @Override
     public ObtenerRolResponse modificarRol(Long id, CrearModificarRolRequest request) throws Exception {
-        // 1. Validaciones básicas
+        // Validaciones básicas
         if (request == null) {
             throw new Exception("El objeto no puede ser nulo.");
         }
@@ -91,24 +91,23 @@ public class RolService implements IRolService {
             throw new Exception("La descripción no puede ser nula ni estar vacía.");
         }
 
-        // 2. Buscar si el rol a modificar existe por su ID
+        // Buscar si el rol a modificar existe por su ID
         Rol rolExistente = rolRepository.findById(id)
                 .orElseThrow(() -> new Exception("El rol con ID " + id + " no fue encontrado"));
 
-        // 3. Validar si el nombre ya lo tiene OTRO rol diferente
+        // Validar si el nombre ya lo tiene OTRO rol diferente
         Rol rolConMismoNombre = rolRepository.findByNombre(request.nombre()).orElse(null);
         if (rolConMismoNombre != null && !rolConMismoNombre.getId().equals(id)) {
             throw new Exception("Ya existe otro rol con el mismo nombre.");
         }
 
-        // 4. Actualizar los campos
+        // Actualizar los campos
         rolExistente.setNombre(request.nombre());
         rolExistente.setDescripcion(request.descripcion());
 
-        // 5. Guardar cambios (UPDATE)
+        // Guardar cambios
         Rol rolActualizado = rolRepository.save(rolExistente);
 
-        // 6. Retornar respuesta
         return RolMapper.rolAObtenerRolResponse(rolActualizado);
     }
 
@@ -117,6 +116,5 @@ public class RolService implements IRolService {
         Rol rol = rolRepository.findById(id).orElseThrow(()-> new Exception("El rol con ID "+ id + " no fue encontrado para eliminar"));
 
         rolRepository.delete(rol);
-
     }
 }
